@@ -35,10 +35,19 @@ char * printCounter(int argc, char* argv[]) {
 }
 
 ...
+// first, create an instance of the output class. Here the TFT_eSPI driver is used:
+SvgOutput_TFT_eSPI svgOutput = SvgOutput_TFT_eSPI();
+// this output instance is passed to the SvgParser:
+SvgParser svg = SvgParser(&svgOutput);
 
+// register callbacks:
 svg.addCallback("nr", printCounter);
 svg.addCallback("dec", decrement);
 svg.addCallback("inc", increment);
+
+// read and output file:
+svg.readFile((char *)"/index.svg");
+svg.print();
 ```
 
 This will replace the text in the box inbetween increase and decrease.
