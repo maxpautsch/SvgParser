@@ -47,7 +47,7 @@ int main()
     SvgParser svg = SvgParser(&svgOutput);
 
     
- svg.addCallback("time",printTime);
+  svg.addCallback("time",printTime);
   svg.addCallback("nr",printCounter);
   svg.addCallback("dec",decrement);
   svg.addCallback("inc",increment);
