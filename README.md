@@ -48,6 +48,16 @@ svg.addCallback("inc", increment);
 // read and output file:
 svg.readFile((char *)"/index.svg");
 svg.print();
+
+// here, all the work is done:
+for(;;){
+  if (tft.getTouch(&x, &y)) {
+    if (svg.onClick(x, y, &link)) {
+      Serial.printf("pressed: #%s#\n", link);
+      free(link);
+    }
+  } 
+}
 ```
 
 This will replace the text in the box inbetween increase and decrease.
