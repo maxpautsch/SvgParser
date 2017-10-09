@@ -11,6 +11,33 @@ SvgParser svg = SvgParser(&svgOutput);
 
 #define CALIBRATION_FILE "/calibrationData"
 
+
+int counter = 42;
+
+char * increment(int argc, char* argv[]) {
+  counter++;
+  return NULL;
+}
+char * decrement(int argc, char* argv[]) {
+  counter--;
+  return NULL;
+}
+
+char * printCounter(int argc, char* argv[]) {
+  char *ptr = (char *)malloc(10);
+  if (ptr == NULL) return NULL;
+  sprintf(ptr, "%i", counter);
+  return ptr;
+}
+
+char * printTime(int argc, char* argv[]) {
+  char *ptr = (char *)malloc(10);
+  if (ptr == NULL) return NULL;
+  sprintf(ptr, "%i", millis());
+  return ptr;
+}
+
+
 void setup(void) {
   uint16_t calibrationData[5];
   uint8_t calDataOK = 0;
@@ -20,7 +47,7 @@ void setup(void) {
 
   tft.init();
 
-  tft.setRotation(3);
+  tft.setRotation(2);
   tft.fillScreen((0xFFFF));
 
   tft.setCursor(20, 0, 2);
@@ -62,21 +89,33 @@ void setup(void) {
   }
 
   tft.fillScreen((0xFFFF));
-svg.readFile((char *)"/img.svg");
-svg.print();
-// list links
-svg.linkManagement();
+
+  svg.addCallback("time", printTime);
+  svg.addCallback("nr", printCounter);
+  svg.addCallback("dec", decrement);
+  svg.addCallback("inc", increment);
+
+  svg.readFile((char *)"/index.svg");
+
+  svg.print();
+  // list links
+  svg.linkManagement();
 }
+
+
 
 void loop() {
   uint16_t x, y;
   static uint16_t color;
   char * link;
+  static bool clicked = false;
 
   if (tft.getTouch(&x, &y)) {
-    if(svg.onClick(x,y, &link))
-       Serial.printf("pressed: #%s#\n",link);
-  }
+    if (svg.onClick(x, y, &link)) {
+      Serial.printf("pressed: #%s#\n", link);
+      free(link);
+    }
+  } 
 }
 
 

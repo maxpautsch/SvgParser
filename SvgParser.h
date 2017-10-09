@@ -67,6 +67,15 @@ struct svgStyle_t {
     
 };
 
+// not yet dynamic
+#define SVG_PARSER_MAX_CALLBACK_ARGS 8
+
+struct svgCallbackList_t {
+    char * expression;
+    char * (*callback)(int argc, char* argv[]);
+    struct svgCallbackList_t *next;
+};
+
 struct svgLinkList_t {
     char * link;
     struct svgLinkList_t *next;
@@ -99,8 +108,13 @@ public:
         DBG_OUT("TEXT: x %i y %i text \"%s\"\n",x,y,text);
         
     }
+    virtual void path(uint16_t *data, uint16_t len, struct svgStyle_t * style)
+    { 
+        DBG_OUT("PATH: len: %i \n",len);
+    }    
+    
 private:
-
+    
 };
 
 // Class functions and variables
@@ -113,14 +127,46 @@ public:
     uint8_t print(int16_t start_x=0, int16_t start_y=0);
     uint8_t readFile(char * fileName);
     uint8_t linkManagement(uint8_t cleanup=0);
+    uint8_t callbackManagement(uint8_t cleanup=0);
+    uint8_t addCallback(char * expression, char * (*callback)(int argc, char* argv[]));
+    
     uint8_t onClick(uint16_t x, uint16_t y, char **link);
+    uint8_t executeCallbacks();
     
 private:
+    
+    SvgOutput *_output;
+    
+    uint16_t _bufLen, _curPos;
+    char  * _data = NULL;
+    
+    int8_t * _callbackStart = "&lt;@";
+    int8_t * _callbackEnd = "@&gt;";
+    int8_t * _linkSplit = "@";
+
+    bool _automaticLinkManagement = true;
+    
+    struct svgLinkList_t * _linkList = NULL;
+    struct svgLinkRefList_t * _linkRefList = NULL;
+    struct svgCallbackList_t * _callbackList = NULL;
+    
+    
+    void cleanup(){
+        // clean up link lists
+        linkManagement(1);
+        //    callbackManagement(1);
+        if(_data != NULL)
+            free(_data);
+        _data = NULL;
+        _bufLen = 0;
+        _curPos = 0;
+    }
+    
     void trimStr();
     
     uint8_t processElement(char * start, enum svgTypes_t type, struct svgStyle_t * style);
     uint8_t processTag(char * start, char ** tagStart, uint16_t *processed, uint8_t parents, char *parentEnd, struct svgStyle_t * parentStyle);
-
+    
     uint8_t getProperty(char * start, const char * property, float * data);
     uint8_t getProperty(char * start, const char * property, int16_t * data);
     uint8_t getProperty(char * start, const char * property, char ** data);
@@ -128,19 +174,10 @@ private:
     uint8_t parseStyle(char * start, struct svgStyle_t * style);
     
     uint8_t addLinkReference(int16_t x_min, int16_t y_min, int16_t x_max, int16_t y_max, struct svgStyle_t * style);
+    char * executeCallbacks(char *programLine);
+    uint8_t parseInCallbacks();
+
     
-    uint16_t _bufLen, _curPos;
-    int8_t  * _data;
-    struct svgLinkList_t * _linkList = NULL;
-    struct svgLinkRefList_t * _linkRefList = NULL;
-    SvgOutput *_output;
-    void cleanup(){
-        // clean up link lists
-        linkManagement(1);
-        free(_data);
-        _bufLen = 0;
-        _curPos = 0;
-    }
     
 };
 
