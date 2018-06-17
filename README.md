@@ -1,4 +1,4 @@
-# embeddedSvg
+# SvgParser
 This project implements a basic SVG parser for GUI applications on ESP8266 based devices. The GUI can be output on a display (with touch) or as a website.
 Currently it supports the TFT_eSPI display driver, but it can be very easily ported to other displays!
 
