@@ -965,5 +965,5 @@ uint8_t SvgParser::readFile(char * fileNameIn){
     // if there are registered callbacks, parse for them in the data
     if(_callbackList != NULL) parseInCallbacks();
     //DBG_OUT("length after trim: %i\n",_bufLen);
-    
+    return true;
 }
